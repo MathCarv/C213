@@ -4,10 +4,10 @@ import os
 import matplotlib.pyplot as plt
 import control as ctrl
 
-save_dir = '../graphics/'
+save_dir = 'graphics/'
 
 # Carregar dados do arquivo .mat
-mat = loadmat('../datasets/Dataset_Grupo1.mat')
+mat = loadmat('datasets/Dataset_Grupo1.mat')
 struct_degrau = mat.get('TARGET_DATA____ProjetoC213_Degrau')
 degrau = struct_degrau[:, 1]  # vetor coluna
 tempo = struct_degrau[:, 0]  # vetor coluna
