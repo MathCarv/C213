@@ -10,7 +10,7 @@ Este projeto foi desenvolvido para aplicar os conhecimentos adquiridos na discip
 ## Bibliotecas e frameworks
 * [NumPy](https://numpy.org/)
 * [Matplotlib](https://matplotlib.org/)
-* [Control](https://python-control.readthedocs.io/en/0.9.0/)
+* [Control](https://pypi.org/project/control/)
 
 ## Como usar?
 
