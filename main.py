@@ -41,9 +41,9 @@ print("Valor do atraso de transporte:", theta)
 print("Valor da constante de tempo:", tau)
 
 # Ziegler-Nichols em malha aberta
-Kp_zn = 0.6 / k
-Ti_zn = theta / 2
-Td_zn = 0.5 * tau
+Kp_zn = (1.2 * tau) / (k * theta)
+Ti_zn = 2 * theta
+Td_zn = tau / 2
 
 # Criando o controlador PID com os parâmetros de Ziegler-Nichols
 num_pid_zn = [Kp_zn * Td_zn, Kp_zn, Kp_zn / Ti_zn]
@@ -70,9 +70,9 @@ print("Tempo de Acomodação (ZN):", tempo_acomodacao_zn)
 print("Overshoot (ZN):", overshoot_zn)
 
 # Cohen e Coon em malha aberta
-Kp_cc = 0.9 / k
-Ti_cc = 3 * theta
-Td_cc = 0.33 * tau
+Kp_cc = (tau / (k * theta)) * ((16 * tau + 3 * theta) / (12 * tau))
+Ti_cc = theta * (32 + (6 * theta) / tau) / (13 + (8 * theta) / tau)
+Td_cc = (4 * theta) / (11 + (2 * theta / tau))
 
 # Criando o controlador PID com os parâmetros de Cohen e Coon
 num_pid_cc = [Kp_cc * Td_cc, Kp_cc, Kp_cc / Ti_cc]
@@ -120,6 +120,17 @@ print("\nKp (CC):", Kp_cc)
 print("Ti (CC):", Ti_cc)
 print("Td (CC):", Td_cc)
 
+# Plotando o degrau de entrada e saída
+plt.figure(figsize=(8, 6))
+plt.plot(tempo, degrau, label='Degrau de Entrada')
+plt.plot(tempo, saida, label='Degrau de Saída')
+plt.xlabel('Tempo [s]')
+plt.ylabel('Amplitude')
+plt.title('Função de Transferência')
+plt.legend()
+plt.grid(True)
+plt.savefig(os.path.join(save_dir, 'FuncaoDeTransferencia.png'))
+
 # Plotando os resultados do Ziegler-Nichols
 plt.figure(figsize=(12, 6))
 plt.subplot(1, 2, 1)
@@ -160,24 +171,38 @@ plt.legend(['Identificação', 'Real'], loc='upper right')
 plt.grid(True)
 plt.savefig(os.path.join(save_dir, 'Cohen-e-Coon.png'))
 
-# Perguntar ao usuário os parâmetros do PID e o Setpoint
-Kp_user = float(input("\nDigite o valor de Kp para o novo PID: "))
-Ti_user = float(input("Digite o valor de Ti para o novo PID: "))
-Td_user = float(input("Digite o valor de Td para o novo PID: "))
-Setpoint_user = float(input("Digite o valor do Setpoint: "))
+# Solicitar ao usuário os valores de k, tau, theta e setpoint
+metodo = input("\nDigite o método desejado (Ziegler-Nichols (zn) ou Cohen e Coon (co)): ")
+K_user = float(input("Digite o valor de K: "))
+Tau_user = float(input("Digite o valor de tau: "))
+Theta_user = float(input("Digite o valor de theta: "))
+Setpoint_user = float(input("Digite o valor do setpoint: "))
 
-# Criar o controlador PID com os novos parâmetros inseridos pelo usuário
+# Calculando os parâmetros de acordo com o método escolhido
+if metodo.lower() == 'zn':
+    Kp_user = (1.2 * Tau_user) / (K_user * Theta_user)
+    Ti_user = 2 * Theta_user
+    Td_user = Tau_user / 2
+elif metodo.lower() == 'co':
+    Kp_user = (Tau_user / (K_user * Theta_user)) * ((16 * Tau_user + 3 * Theta_user) / (12 * Tau_user))
+    Ti_user = Theta_user * (32 + (6 * Theta_user) / Tau_user) / (13 + (8 * Theta_user) / Tau_user)
+    Td_user = (4 * Theta_user) / (11 + (2 * Theta_user / Tau_user))
+else:
+    print("Método inválido. Por favor, escolha entre Ziegler-Nichols e Cohen e Coon.")
+    exit()
+
+# Criar o controlador PID com os parâmetros calculados
 num_pid_user = [Kp_user * Td_user, Kp_user, Kp_user / Ti_user]
 den_pid_user = [1, 0]
 PID_user = ctrl.TransferFunction(num_pid_user, den_pid_user)
 
-# Criar o sistema em série com os novos parâmetros inseridos pelo usuário
+# Criar o sistema em série com os parâmetros calculados
 Cs_user = ctrl.series(PID_user, sys_atraso)
 
-# Gerar a resposta ao degrau do sistema em malha fechada com os novos parâmetros inseridos pelo usuário
+# Gerar a resposta ao degrau do sistema em malha fechada com os parâmetros calculados
 tempo_resposta_user, resposta_user = ctrl.step_response(ctrl.feedback(Cs_user, 1))
 
-# Plotar os resultados com os novos parâmetros inseridos pelo usuário
+# Plotar os resultados com os parâmetros inseridos pelo usuário
 plt.figure(figsize=(12, 6))
 plt.subplot(1, 2, 1)
 plt.plot(tempo_resposta_user, resposta_user, label='Parametros do Usuário')
@@ -195,6 +220,6 @@ plt.ylabel('Saída [°C]')
 plt.title('Dados Reais vs Identificação (Parametros do Usuário)')
 plt.legend(['Identificação', 'Real'], loc='upper right')
 plt.grid(True)
-plt.savefig(os.path.join(save_dir, 'ParametrosDoUsuário.png'))
+plt.savefig(os.path.join(save_dir, 'ParametrosDoUsuario.png'))
 
 plt.show()
