@@ -2,6 +2,11 @@
 
 Este projeto foi desenvolvido para aplicar os conhecimentos adquiridos na disciplina de **C213** (Sistemas Embarcados) durante a graduação em Engenharia de Computação pelo [Inatel](https://inatel.br/home/).
 
+## Membros:
+* Matheus Camara Carvalho
+* Igor da Silva Villamarim
+* Gabriel de Souza Gemelle Leal
+
 ## Conteúdos estudados:
 * Modelagem de sistemas;
 * Identificação de sistemas;
