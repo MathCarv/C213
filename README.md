@@ -1,4 +1,6 @@
-# Controle PID - Projeto C213
+# Disciplina C213
+
+# Projeto PID
 
 Este projeto foi desenvolvido para aplicar os conhecimentos adquiridos na disciplina de **C213** (Sistemas Embarcados) durante a graduação em Engenharia de Computação pelo [Inatel](https://inatel.br/home/).
 
