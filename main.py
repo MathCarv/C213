@@ -173,39 +173,39 @@ plt.savefig(os.path.join(save_dir, 'Cohen-e-Coon.png'))
 
 # Solicitar ao usuário os valores de k, tau, theta e setpoint
 metodo = input("\nDigite o método desejado (Ziegler-Nichols (zn) ou Cohen e Coon (co)): ")
-K_user = float(input("Digite o valor de K: "))
-Tau_user = float(input("Digite o valor de tau: "))
-Theta_user = float(input("Digite o valor de theta: "))
-Setpoint_user = float(input("Digite o valor do setpoint: "))
+K_usuario = float(input("Digite o valor de K: "))
+Tau_usuario = float(input("Digite o valor de tau: "))
+Theta_usuario = float(input("Digite o valor de theta: "))
+Setpoint_usuario = float(input("Digite o valor do setpoint: "))
 
 # Calculando os parâmetros de acordo com o método escolhido
 if metodo.lower() == 'zn':
-    Kp_user = (1.2 * Tau_user) / (K_user * Theta_user)
-    Ti_user = 2 * Theta_user
-    Td_user = Tau_user / 2
+    Kp_usuario = (1.2 * Tau_usuario) / (K_usuario * Theta_usuario)
+    Ti_usuario = 2 * Theta_usuario
+    Td_usuario = Tau_usuario / 2
 elif metodo.lower() == 'co':
-    Kp_user = (Tau_user / (K_user * Theta_user)) * ((16 * Tau_user + 3 * Theta_user) / (12 * Tau_user))
-    Ti_user = Theta_user * (32 + (6 * Theta_user) / Tau_user) / (13 + (8 * Theta_user) / Tau_user)
-    Td_user = (4 * Theta_user) / (11 + (2 * Theta_user / Tau_user))
+    Kp_usuario = (Tau_usuario / (K_usuario * Theta_usuario)) * ((16 * Tau_usuario + 3 * Theta_usuario) / (12 * Tau_usuario))
+    Ti_usuario = Theta_usuario * (32 + (6 * Theta_usuario) / Tau_usuario) / (13 + (8 * Theta_usuario) / Tau_usuario)
+    Td_usuario = (4 * Theta_usuario) / (11 + (2 * Theta_usuario / Tau_usuario))
 else:
     print("Método inválido. Por favor, escolha entre Ziegler-Nichols e Cohen e Coon.")
     exit()
 
 # Criar o controlador PID com os parâmetros calculados
-num_pid_user = [Kp_user * Td_user, Kp_user, Kp_user / Ti_user]
-den_pid_user = [1, 0]
-PID_user = ctrl.TransferFunction(num_pid_user, den_pid_user)
+num_pid_usuario = [Kp_usuario * Td_usuario, Kp_usuario, Kp_usuario / Ti_usuario]
+den_pid_usuario = [1, 0]
+PID_usuario = ctrl.TransferFunction(num_pid_usuario, den_pid_usuario)
 
 # Criar o sistema em série com os parâmetros calculados
-Cs_user = ctrl.series(PID_user, sys_atraso)
+Cs_usuario = ctrl.series(PID_usuario, sys_atraso)
 
 # Gerar a resposta ao degrau do sistema em malha fechada com os parâmetros calculados
-tempo_resposta_user, resposta_user = ctrl.step_response(ctrl.feedback(Cs_user, 1))
+tempo_resposta_usuario, resposta_usuario = ctrl.step_response(ctrl.feedback(Cs_usuario, 1))
 
 # Plotar os resultados com os parâmetros inseridos pelo usuário
 plt.figure(figsize=(12, 6))
 plt.subplot(1, 2, 1)
-plt.plot(tempo_resposta_user, resposta_user, label='Parametros do Usuário')
+plt.plot(tempo_resposta_usuario, resposta_usuario, label='Parametros do Usuário')
 plt.xlabel('Tempo [s]')
 plt.ylabel('Resposta ao Degrau')
 plt.title('Resposta ao Degrau do Sistema em Malha Fechada (Parametros do Usuário)')
@@ -214,7 +214,7 @@ plt.grid(True)
 
 plt.subplot(1, 2, 2)
 plt.plot(tempo, saida, 'r--')
-plt.plot(tempo_resposta_user, resposta_user, 'b-', label='Parametros do Usuário')
+plt.plot(tempo_resposta_usuario, resposta_usuario, 'b-', label='Parametros do Usuário')
 plt.xlabel('Tempo [s]')
 plt.ylabel('Saída [°C]')
 plt.title('Dados Reais vs Identificação (Parametros do Usuário)')
