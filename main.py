@@ -14,6 +14,7 @@ degrau = struct_degrau[:, 1].tolist()  # vetor coluna
 tempo = struct_degrau[:, 0].tolist()  # vetor coluna
 struct_saida = mat.get('TARGET_DATA____ProjetoC213_Saida')
 saida = struct_saida[:, 1].tolist()  # vetor coluna
+
 AmplitudeDegrau = np.mean(degrau)
 valorInicial = saida[0]
 
@@ -273,10 +274,10 @@ resposta_usuario_interpolada = np.interp(tempo, tempo_resposta_usuario, resposta
 # Calculando o erro para Ziegler-Nichols com os valores interpolados (malha fechada)
 erro_zn = calcular_erro_quadratico_medio(saida, resposta_zn_interpolada)
 
-# Calculando o erro para Cohen e Coon com os valores interpolados (malha aberta)
+# Calculando o erro para Cohen e Coon com os valores interpolados (malha fechada)
 erro_cc = calcular_erro_quadratico_medio(saida, resposta_cc_interpolada)
 
-# Calculando o erro para os parâmetros inseridos pelo usuário com os valores interpolados (malha aberta)
+# Calculando o erro para os parâmetros inseridos pelo usuário com os valores interpolados (malha fechada)
 erro_usuario = calcular_erro_quadratico_medio(saida, resposta_usuario_interpolada)
 
 # Calculando o erro para Ziegler-Nichols com os valores interpolados (malha aberta)
