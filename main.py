@@ -4,6 +4,7 @@ import os
 from scipy.signal import step, lti
 import matplotlib.pyplot as plt
 import control as ctrl
+import control as cnt
 
 save_dir = 'graphics/'
 
@@ -260,6 +261,43 @@ Cs_usuario = ctrl.series(PID_usuario, sys_atraso)
 # Gerar a resposta ao degrau do sistema em malha fechada com os parâmetros calculados
 tempo_resposta_usuario, resposta_usuario = ctrl.step_response(ctrl.feedback(Cs_usuario, 1))
 
+# Função para calcular o erro quadrático médio
+def calcular_erro_quadratico_medio(saida_real, saida_estimada):
+    erro = np.sqrt(np.mean((saida_real - saida_estimada) ** 2))
+    return erro
+
+# Interpolação da resposta ao degrau do sistema para coincidir com os tempos dos dados reais
+resposta_zn_interpolada = np.interp(tempo, tempo_resposta_zn, resposta_zn)
+resposta_cc_interpolada = np.interp(tempo, tempo_resposta_cc, resposta_cc)
+resposta_usuario_interpolada = np.interp(tempo, tempo_resposta_usuario, resposta_usuario)
+
+# Calculando o erro para Ziegler-Nichols com os valores interpolados (malha fechada)
+erro_zn = calcular_erro_quadratico_medio(saida, resposta_zn_interpolada)
+
+# Calculando o erro para Cohen e Coon com os valores interpolados (malha aberta)
+erro_cc = calcular_erro_quadratico_medio(saida, resposta_cc_interpolada)
+
+# Calculando o erro para os parâmetros inseridos pelo usuário com os valores interpolados (malha aberta)
+erro_usuario = calcular_erro_quadratico_medio(saida, resposta_usuario_interpolada)
+
+# Calculando o erro para Ziegler-Nichols com os valores interpolados (malha aberta)
+erro_zn_malha_aberta = calcular_erro_quadratico_medio(degrau, resposta_zn_interpolada)
+
+# Calculando o erro para Cohen e Coon com os valores interpolados (malha aberta)
+erro_cc_malha_aberta = calcular_erro_quadratico_medio(degrau, resposta_cc_interpolada)
+
+# Calculando o erro para os parâmetros inseridos pelo usuário com os valores interpolados (malha aberta)
+erro_usuario_malha_aberta = calcular_erro_quadratico_medio(degrau, resposta_usuario_interpolada)
+
+# Imprimindo os erros
+print("\nErros:")
+print("Erro Ziegler-Nichols (malha fechada):", erro_zn)
+print("Erro Cohen e Coon (malha fechada):", erro_cc)
+print("Erro com parâmetros do usuário (malha fechada):", erro_usuario)
+print("\nErro Ziegler-Nichols (malha aberta):", erro_zn_malha_aberta)
+print("Erro Cohen e Coon (malha aberta):", erro_cc_malha_aberta)
+print("Erro com parâmetros do usuário (malha aberta):", erro_usuario_malha_aberta)
+
 # Plotar os resultados com os parâmetros inseridos pelo usuário
 plt.figure(figsize=(12, 6))
 plt.plot(tempo_resposta_usuario, resposta_usuario, label='Parametros do Usuário')
@@ -270,9 +308,11 @@ plt.legend(['Resposta ao Degrau'], loc='upper right')
 plt.grid(True)
 plt.savefig(os.path.join(save_dir, 'DegrauUsuario.png'))
 
+time = np.linspace(0, 5, 10)
+
+
 sys2 = (K_usuario, [Tau_usuario, 1])
 tout2, yout2 = step(sys2, T=np.linspace(0, tempo[-1], len(tempo)))
-
 plt.figure(figsize=(12, 6))
 plt.plot(tempo, saida, 'r--', label ='Real')
 plt.plot(tout2 + Theta_usuario, yout2 * AmplitudeDegrau, label='Identificação')
