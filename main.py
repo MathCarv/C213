@@ -4,7 +4,6 @@ import os
 from scipy.signal import step, lti
 import matplotlib.pyplot as plt
 import control as ctrl
-import control as cnt
 
 save_dir = 'graphics/'
 
