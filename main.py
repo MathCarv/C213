@@ -308,9 +308,6 @@ plt.legend(['Resposta ao Degrau'], loc='upper right')
 plt.grid(True)
 plt.savefig(os.path.join(save_dir, 'DegrauUsuario.png'))
 
-time = np.linspace(0, 5, 10)
-
-
 sys2 = (K_usuario, [Tau_usuario, 1])
 tout2, yout2 = step(sys2, T=np.linspace(0, tempo[-1], len(tempo)))
 plt.figure(figsize=(12, 6))
