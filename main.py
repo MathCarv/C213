@@ -1,6 +1,7 @@
 from scipy.io import loadmat
 import numpy as np
 import os
+from scipy.signal import step, lti
 import matplotlib.pyplot as plt
 import control as ctrl
 
@@ -181,6 +182,9 @@ print("\nKp (CC):", Kp_cc)
 print("Ti (CC):", Ti_cc)
 print("Td (CC):", Td_cc)
 
+sys = (k, [tau, 1])
+tout, yout = step(sys, T=np.linspace(0, tempo[-1], len(tempo)))
+
 # Plotando o degrau de entrada e saída
 plt.figure(figsize=(8, 6))
 plt.plot(tempo, degrau, label='Degrau de Entrada')
@@ -193,91 +197,87 @@ plt.grid(True)
 plt.savefig(os.path.join(save_dir, 'FuncaoDeTransferencia.png'))
 
 # Plotando os resultados do Ziegler-Nichols
-plt.figure(figsize=(12, 6))
-plt.subplot(1, 2, 1)
+plt.figure(figsize=(8, 6))
 plt.plot(tempo_resposta_zn, resposta_zn, label='Ziegler-Nichols')
 plt.xlabel('Tempo [s]')
 plt.ylabel('Resposta ao Degrau')
 plt.title('Resposta ao Degrau do Sistema em Malha Fechada (Ziegler-Nichols)')
 plt.legend(['Resposta ao Degrau'], loc='upper right')
 plt.grid(True)
-
-plt.subplot(1, 2, 2)
-plt.plot(tempo, saida, 'r--')
-plt.plot(tempo_resposta_zn, resposta_zn, 'b-', label='Ziegler-Nichols')
-plt.xlabel('Tempo [s]')
-plt.ylabel('Saída [°C]')
-plt.title('Dados Reais vs Identificação (Ziegler-Nichols)')
-plt.legend(['Identificação', 'Real'], loc='upper right')
-plt.grid(True)
-plt.savefig(os.path.join(save_dir, 'Ziegler-Nichols.png'))
+plt.savefig(os.path.join(save_dir, 'RespostaAoDegrauZN.png'))
 
 # Plotando os resultados de Cohen e Coon
-plt.figure(figsize=(12, 6))
-plt.subplot(1, 2, 1)
+plt.figure(figsize=(8, 6))
 plt.plot(tempo_resposta_cc, resposta_cc, label='Cohen e Coon')
 plt.xlabel('Tempo [s]')
 plt.ylabel('Resposta ao Degrau')
 plt.title('Resposta ao Degrau do Sistema em Malha Fechada (Cohen e Coon)')
 plt.legend(['Resposta ao Degrau'], loc='upper right')
 plt.grid(True)
+plt.savefig(os.path.join(save_dir, 'RespostaAoDegrauCC.png'))
 
-plt.subplot(1, 2, 2)
-plt.plot(tempo, saida, 'r--')
-plt.plot(tempo_resposta_cc, resposta_cc, 'g-', label='Cohen e Coon')
+sys = (k, [tau, 1])
+tout, yout = step(sys, T=np.linspace(0, tempo[-1], len(tempo)))
+
+plt.figure(figsize=(8, 6))
+plt.plot(tempo, saida, 'r--', label ='Real')
+plt.plot(tout + theta, yout * AmplitudeDegrau, label='Identificação ')
 plt.xlabel('Tempo [s]')
-plt.ylabel('Saída [°C]')
-plt.title('Dados Reais vs Identificação (Cohen e Coon)')
+plt.ylabel('Saída')
+plt.title('Dados Reais vs Identificação')
 plt.legend(['Identificação', 'Real'], loc='upper right')
 plt.grid(True)
 plt.savefig(os.path.join(save_dir, 'Cohen-e-Coon.png'))
 
 # Solicitar ao usuário os valores de k, tau, theta e setpoint
 metodo = input("\nDigite o método desejado (Ziegler-Nichols (zn) ou Cohen e Coon (co)): ")
-K_user = float(input("Digite o valor de K: "))
-Tau_user = float(input("Digite o valor de tau: "))
-Theta_user = float(input("Digite o valor de theta: "))
-Setpoint_user = float(input("Digite o valor do setpoint: "))
+K_usuario = float(input("Digite o valor de K: "))
+Tau_usuario = float(input("Digite o valor de tau: "))
+Theta_usuario = float(input("Digite o valor de theta: "))
+Setpoint_usuario = float(input("Digite o valor do setpoint: "))
 
 # Calculando os parâmetros de acordo com o método escolhido
 if metodo.lower() == 'zn':
-    Kp_user = (1.2 * Tau_user) / (K_user * Theta_user)
-    Ti_user = 2 * Theta_user
-    Td_user = Tau_user / 2
+    Kp_usuario = (1.2 * Tau_usuario) / (K_usuario * Theta_usuario)
+    Ti_usuario = 2 * Theta_usuario
+    Td_usuario = Tau_usuario / 2
 elif metodo.lower() == 'co':
-    Kp_user = (Tau_user / (K_user * Theta_user)) * ((16 * Tau_user + 3 * Theta_user) / (12 * Tau_user))
-    Ti_user = Theta_user * (32 + (6 * Theta_user) / Tau_user) / (13 + (8 * Theta_user) / Tau_user)
-    Td_user = (4 * Theta_user) / (11 + (2 * Theta_user / Tau_user))
+    Kp_usuario = (Tau_usuario / (K_usuario * Theta_usuario)) * ((16 * Tau_usuario + 3 * Theta_usuario) / (12 * Tau_usuario))
+    Ti_usuario = Theta_usuario * (32 + (6 * Theta_usuario) / Tau_usuario) / (13 + (8 * Theta_usuario) / Tau_usuario)
+    Td_usuario = (4 * Theta_usuario) / (11 + (2 * Theta_usuario / Tau_usuario))
 else:
     print("Método inválido. Por favor, escolha entre Ziegler-Nichols e Cohen e Coon.")
     exit()
 
 # Criar o controlador PID com os parâmetros calculados
-num_pid_user = [Kp_user * Td_user, Kp_user, Kp_user / Ti_user]
-den_pid_user = [1, 0]
-PID_user = ctrl.TransferFunction(num_pid_user, den_pid_user)
+num_pid_usuario = [Kp_usuario * Td_usuario, Kp_usuario, Kp_usuario / Ti_usuario]
+den_pid_usuario = [1, 0]
+PID_usuario = ctrl.TransferFunction(num_pid_usuario, den_pid_usuario)
 
 # Criar o sistema em série com os parâmetros calculados
-Cs_user = ctrl.series(PID_user, sys_atraso)
+Cs_usuario = ctrl.series(PID_usuario, sys_atraso)
 
 # Gerar a resposta ao degrau do sistema em malha fechada com os parâmetros calculados
-tempo_resposta_user, resposta_user = ctrl.step_response(ctrl.feedback(Cs_user, 1))
+tempo_resposta_usuario, resposta_usuario = ctrl.step_response(ctrl.feedback(Cs_usuario, 1))
 
 # Plotar os resultados com os parâmetros inseridos pelo usuário
 plt.figure(figsize=(12, 6))
-plt.subplot(1, 2, 1)
-plt.plot(tempo_resposta_user, resposta_user, label='Parametros do Usuário')
+plt.plot(tempo_resposta_usuario, resposta_usuario, label='Parametros do Usuário')
 plt.xlabel('Tempo [s]')
 plt.ylabel('Resposta ao Degrau')
 plt.title('Resposta ao Degrau do Sistema em Malha Fechada (Parametros do Usuário)')
 plt.legend(['Resposta ao Degrau'], loc='upper right')
 plt.grid(True)
+plt.savefig(os.path.join(save_dir, 'DegrauUsuario.png'))
 
-plt.subplot(1, 2, 2)
-plt.plot(tempo, saida, 'r--')
-plt.plot(tempo_resposta_user, resposta_user, 'b-', label='Parametros do Usuário')
+sys2 = (K_usuario, [Tau_usuario, 1])
+tout2, yout2 = step(sys2, T=np.linspace(0, tempo[-1], len(tempo)))
+
+plt.figure(figsize=(12, 6))
+plt.plot(tempo, saida, 'r--', label ='Real')
+plt.plot(tout2 + Theta_usuario, yout2 * AmplitudeDegrau, label='Identificação')
 plt.xlabel('Tempo [s]')
-plt.ylabel('Saída [°C]')
+plt.ylabel('Saída')
 plt.title('Dados Reais vs Identificação (Parametros do Usuário)')
 plt.legend(['Identificação', 'Real'], loc='upper right')
 plt.grid(True)
