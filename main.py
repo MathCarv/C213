@@ -8,7 +8,7 @@ import control as ctrl
 save_dir = 'graphics/'
 
 # Carregar dados do arquivo .mat
-mat = loadmat('dataset/Dataset_Grupo1.mat')
+mat = loadmat('dataset/Dataset_Grupo3.mat')
 struct_degrau = mat.get('TARGET_DATA____ProjetoC213_Degrau')
 degrau = struct_degrau[:, 1].tolist()  # vetor coluna
 tempo = struct_degrau[:, 0].tolist()  # vetor coluna
