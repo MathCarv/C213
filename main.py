@@ -87,21 +87,23 @@ saida_sundaresan = y +  valorInicial
 erro_sundaresan = np.sqrt(np.mean((saida - saida_sundaresan)**2))
 
 # Escolhendo através do menor erro
+print("\nErro Smith: {:.5f} ({:.3f}%)".format(erro_smith, erro_smith * 100))
+print("\nErro Sundaresan: {:.5f} ({:.3f}%)".format(erro_sundaresan, erro_sundaresan * 100))
 if erro_smith < erro_sundaresan:
     k = smith[0]
     tau = smith[1]
     theta = smith[2]
-    print("O método escolhido foi smith!\n")
+    print("\nO método escolhido foi smith por ter menor erro!\n")
 
 else :
     k = sundaresan[0]
     tau = sundaresan[1]
     theta = sundaresan[2]
-    print("O método escolhido foi Sundaresan!\n")
+    print("O método escolhido foi Sundaresan por ter menor erro!\n")
 
-print("Valor de K:", k)
-print("Valor do atraso de transporte:", theta)
-print("Valor da constante de tempo:", tau)
+print("Valor de K: {:.3f}".format(k))
+print("Valor do atraso de transporte: {:.3f}".format(theta))
+print("Valor da constante de tempo: {:.3f}".format(tau))
 
 # Ziegler-Nichols em malha aberta
 Kp_zn = (1.2 * tau) / (k * theta)
@@ -117,7 +119,7 @@ PID_zn = ctrl.TransferFunction(num_pid_zn, den_pid_zn)
 sys_atraso = ctrl.tf([1], [tau, 1])
 Cs_zn = ctrl.series(PID_zn, sys_atraso)
 
-# Gerando a resposta ao degrau do sistema em malha fechada com Ziegler-Nichols
+# Gerando a resposta ao degrau do sistema em malha fechada com Ziegler-Nichols 
 tempo_resposta_zn, resposta_zn = ctrl.step_response(ctrl.feedback(Cs_zn, 1))
 
 # Calculando informações adicionais usando a função step_info
@@ -128,9 +130,9 @@ overshoot_zn = info_zn['Overshoot']
 
 # Resultados de Ziegler-Nichols
 print("\nResultados do Ziegler-Nichols:")
-print("Tempo de Subida (ZN):", tempo_subida_zn)
-print("Tempo de Acomodação (ZN):", tempo_acomodacao_zn)
-print("Overshoot (ZN):", overshoot_zn)
+print("Tempo de Subida (ZN): {:.3f}".format(tempo_subida_zn))
+print("Tempo de Acomodação (ZN): {:.3f}".format(tempo_acomodacao_zn))
+print("Overshoot (ZN): {:.3f}".format(overshoot_zn))
 
 # Cohen e Coon em malha aberta
 Kp_cc = (tau / (k * theta)) * ((16 * tau + 3 * theta) / (12 * tau))
@@ -156,9 +158,9 @@ overshoot_cc = info_cc['Overshoot']
 
 # Resultados de Cohen e Coon
 print("\nResultados de Cohen e Coon:")
-print("Tempo de Subida (CC):", tempo_subida_cc)
-print("Tempo de Acomodacao (CC):", tempo_acomodacao_cc)
-print("Overshoot (CC):", overshoot_cc)
+print("Tempo de Subida (CC): {:.3f}".format(tempo_subida_cc))
+print("Tempo de Acomodacao (CC): {:.3f}".format(tempo_acomodacao_cc))
+print("Overshoot (CC): {:.3f}".format(overshoot_cc))
 
 # Construindo a string da função de transferência com base nos parâmetros calculados para Ziegler-Nichols
 num_str_zn = f'{Kp_zn * Td_zn:.4f}s^2 + {Kp_zn:.4f}s + {Kp_zn / Ti_zn:.4f}'
@@ -173,15 +175,15 @@ Cs_str_cc = f'{num_str_cc}\n{"-" * 28}\n{" " * 7}{den_str_cc}'
 # Resultados das funções de transferência
 print("\nFunção de transferência do sistema (ZN):\n")
 print(Cs_str_zn)
-print("\nKp (ZN):", Kp_zn)
-print("Ti (ZN):", Ti_zn)
-print("Td (ZN):", Td_zn)
+print("\nKp (ZN): {:.3f}".format(Kp_zn))
+print("Ti (ZN): {:.3f}".format(Ti_zn))
+print("Td (ZN): {:.3f}".format(Td_zn))
 
 print("\nFunção de transferência do sistema (CC):\n")
 print(Cs_str_cc)
-print("\nKp (CC):", Kp_cc)
-print("Ti (CC):", Ti_cc)
-print("Td (CC):", Td_cc)
+print("\nKp (CC): {:.3f}".format(Kp_cc))
+print("Ti (CC): {:.3f}".format( Ti_cc))
+print("Td (CC): {:.3f}".format(Td_cc))
 
 sys = (k, [tau, 1])
 tout, yout = step(sys, T=np.linspace(0, tempo[-1], len(tempo)))
@@ -291,12 +293,12 @@ erro_usuario_malha_aberta = calcular_erro_quadratico_medio(degrau, resposta_usua
 
 # Imprimindo os erros
 print("\nErros:")
-print("Erro Ziegler-Nichols (malha fechada):", erro_zn)
-print("Erro Cohen e Coon (malha fechada):", erro_cc)
-print("Erro com parâmetros do usuário (malha fechada):", erro_usuario)
-print("\nErro Ziegler-Nichols (malha aberta):", erro_zn_malha_aberta)
-print("Erro Cohen e Coon (malha aberta):", erro_cc_malha_aberta)
-print("Erro com parâmetros do usuário (malha aberta):", erro_usuario_malha_aberta)
+print("Erro Ziegler-Nichols (malha fechada): {:.3f}".format(erro_zn))
+print("Erro Cohen e Coon (malha fechada): {:.3f}".format(erro_cc))
+print("Erro com parâmetros do usuário (malha fechada): {:.3f}".format(erro_usuario))
+print("\nErro Ziegler-Nichols (malha aberta): {:.3f}".format(erro_zn_malha_aberta))
+print("Erro Cohen e Coon (malha aberta): {:.3f}".format(erro_cc_malha_aberta))
+print("Erro com parâmetros do usuário (malha aberta): {:.3f}".format(erro_usuario_malha_aberta))
 
 # Plotar os resultados com os parâmetros inseridos pelo usuário
 plt.figure(figsize=(12, 6))
