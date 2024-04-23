@@ -293,12 +293,12 @@ erro_usuario_malha_aberta = calcular_erro_quadratico_medio(degrau, resposta_usua
 
 # Imprimindo os erros
 print("\nErros:")
-print("Erro Ziegler-Nichols (malha fechada): {:.3f}".format(erro_zn))
-print("Erro Cohen e Coon (malha fechada): {:.3f}".format(erro_cc))
-print("Erro com parâmetros do usuário (malha fechada): {:.3f}".format(erro_usuario))
-print("\nErro Ziegler-Nichols (malha aberta): {:.3f}".format(erro_zn_malha_aberta))
-print("Erro Cohen e Coon (malha aberta): {:.3f}".format(erro_cc_malha_aberta))
-print("Erro com parâmetros do usuário (malha aberta): {:.3f}".format(erro_usuario_malha_aberta))
+print("Erro Ziegler-Nichols (malha fechada): {:.3f} ({:.3f}%)".format(erro_zn, erro_zn * 100))
+print("Erro Cohen e Coon (malha fechada): {:.3f} ({:.3f}%)".format(erro_cc, erro_cc * 100))
+print("Erro com parâmetros do usuário (malha fechada): {:.3f} ({:.3f}%)".format(erro_usuario, erro_usuario * 100))
+print("\nErro Ziegler-Nichols (malha aberta): {:.3f} ({:.3f}%)".format(erro_zn_malha_aberta, erro_zn_malha_aberta * 100))
+print("Erro Cohen e Coon (malha aberta): {:.3f} ({:.3f}%)".format(erro_cc_malha_aberta, erro_cc_malha_aberta * 100))
+print("Erro com parâmetros do usuário (malha aberta): {:.3f} ({:.3f}%)".format(erro_usuario_malha_aberta, erro_usuario_malha_aberta * 100))
 
 # Plotar os resultados com os parâmetros inseridos pelo usuário
 plt.figure(figsize=(12, 6))
