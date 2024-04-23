@@ -72,21 +72,21 @@ def Sundaresan(Step, Tempo, Saída):
     
     return identificacaoSundaresan
 
-# Parametros da função Smith
+# Valores da função Smith
 smith = Smith(np.mean(degrau), tempo, saida)
-sys_smith = ctrl.TransferFunction([smith[0], 1], [smith[1], 1])
+sys_smith = ctrl.TransferFunction([smith[0]], [smith[1], 1])
 t, y = ctrl.step_response(sys_smith * AmplitudeDegrau, tempo)
 saida_smith = y +  valorInicial
 erro_smith = np.sqrt(np.mean((saida - saida_smith)**2))
 
-# Parametros da função Sundaresan
+# Valores da função Sundaresan
 sundaresan = Sundaresan(np.mean(degrau), tempo, saida)
-sys_sundaresan = ctrl.TransferFunction([sundaresan[0], 1], [sundaresan[1], 1])
+sys_sundaresan = ctrl.TransferFunction([sundaresan[0]], [sundaresan[1], 1])
 t, y = ctrl.step_response(sys_sundaresan * AmplitudeDegrau, tempo)
 saida_sundaresan = y +  valorInicial
 erro_sundaresan = np.sqrt(np.mean((saida - saida_sundaresan)**2))
 
-# Escolhendo através do erro
+# Escolhendo através do menor erro
 if erro_smith < erro_sundaresan:
     k = smith[0]
     tau = smith[1]
@@ -106,7 +106,7 @@ print("Valor da constante de tempo:", tau)
 # Ziegler-Nichols em malha aberta
 Kp_zn = (1.2 * tau) / (k * theta)
 Ti_zn = 2 * theta
-Td_zn = tau / 2
+Td_zn = theta / 2
 
 # Criando o controlador PID com os parâmetros de Ziegler-Nichols
 num_pid_zn = [Kp_zn * Td_zn, Kp_zn, Kp_zn / Ti_zn]
